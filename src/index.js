@@ -38,10 +38,12 @@ function Nav(props) {
 }
 
 function RepoGrid(props) {
+  // generates our repo grid - a good change may be to use grid instead of flexbox
   return (
     <ul style={{ display: "flex", flexWrap: "wrap" }}>
       {props.repos.map(
         ({ name, owner: { login }, stargazers_count, html_url }) => {
+          // using nested destructuring above for owner to get owner.login
           return (
             <li key={name} style={{ margin: 30 }}>
               <ul>
