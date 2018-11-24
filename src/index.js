@@ -54,7 +54,7 @@ class Loading extends React.Component {
 
 function PopularRepos(props) {
   return (
-    <ul>
+    <ul style={{ display: "grid", "grid-template-columns": "repeat(3, 1fr)" }}>
       {props.popularRepos.map(data => {
         const { url, name, stargazers_count } = data;
 
