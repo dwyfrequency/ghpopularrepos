@@ -54,7 +54,13 @@ class Loading extends React.Component {
 
 function PopularRepos(props) {
   return (
-    <ul style={{ display: "grid", "grid-template-columns": "repeat(3, 1fr)" }}>
+    <ul
+      style={{
+        display: "grid",
+        "grid-template-columns": "repeat(3, 1fr)",
+        "grid-gap": "20px"
+      }}
+    >
       {props.popularRepos.map(data => {
         const { url, name, stargazers_count } = data;
 
@@ -62,7 +68,7 @@ function PopularRepos(props) {
           <li key={name}>
             <ul>
               <li>{url}</li>
-              <li>{name}</li>
+              <li>@{name}</li>
               <li>{stargazers_count}</li>
             </ul>
           </li>
@@ -77,22 +83,22 @@ class App extends React.Component {
     super(props);
     this.state = {
       languages: ["all", "javascript", "ruby", "python"],
-      loadBody: false,
+      loaded: false,
       popularRepos: null
     };
   }
   onClickHandler = language => {
     window.API.fetchPopularRepos(language).then(repos => {
-      this.setState({ loadBody: true, popularRepos: repos });
+      this.setState({ loaded: true, popularRepos: repos });
     });
   };
   render() {
-    const { languages, loadBody, popularRepos } = this.state;
+    const { languages, loaded, popularRepos } = this.state;
     return (
       <div>
         <Nav languages={languages} getRepos={this.onClickHandler} />
-        {/* <Loading /> */}
-        {loadBody ? <PopularRepos popularRepos={popularRepos} /> : null}
+        {loaded ? null : <Loading />}
+        {loaded ? <PopularRepos popularRepos={popularRepos} /> : null}
       </div>
     );
   }
