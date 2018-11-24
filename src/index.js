@@ -23,12 +23,39 @@ function Nav(props) {
     <nav>
       <ul>
         {languages.map(lang => (
-          <li key={lang} onClick={() => {}}>
+          <li
+            key={lang}
+            onClick={() => {
+              props.handleSelectLanguage(lang);
+            }}
+          >
             {lang}
           </li>
         ))}
       </ul>
     </nav>
+  );
+}
+
+function RepoGrid(props) {
+  return (
+    <ul style={{ display: "flex", flexWrap: "wrap" }}>
+      {props.repos.map(
+        ({ name, owner: { login }, stargazers_count, html_url }) => {
+          return (
+            <li key={name} style={{ margin: 30 }}>
+              <ul>
+                <li>
+                  <a href={html_url}>{name}</a>
+                </li>
+                <li>@{login}</li>
+                <li>{stargazers_count}</li>
+              </ul>
+            </li>
+          );
+        }
+      )}
+    </ul>
   );
 }
 
@@ -58,12 +85,57 @@ class Loading extends React.Component {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      repos: [],
+      activeLanguage: "all",
+      loading: true
+    };
+
+    this.handleSelectLanguage = this.handleSelectLanguage.bind(this);
+    this.fetchRepos = this.fetchRepos.bind(this);
+  }
+  componentDidMount = () => {
+    // when component first mounts it will fetch all the popular repositories
+    this.fetchRepos(this.state.activeLanguage);
+  };
+
+  componentDidUpdate = (prevProps, prevState) => {
+    // if the language selected was dif than before, fetch the repos for the new lang
+    if (prevState.activeLanguage !== this.state.activeLanguage) {
+      this.fetchRepos(this.state.activeLanguage);
+    }
+  };
+
+  fetchRepos(lang) {
+    // show the loading while we get the popular repos from the api then set it update the state again with new info
+    this.setState({
+      loading: true
+    });
+
+    window.API.fetchPopularRepos(lang).then(repos => {
+      this.setState({
+        loading: false,
+        repos
+      });
+    });
+  }
+  handleSelectLanguage(lang) {
+    this.setState({
+      activeLanguage: lang
+    });
   }
   render() {
     return (
       <div>
-        {" "}
-        <Nav />
+        <Nav handleSelectLanguage={this.handleSelectLanguage} />
+        {this.state.loading === true ? (
+          <Loading />
+        ) : (
+          <div>
+            <h1 style={{ textAlign: "center" }}>{this.state.activeLanguage}</h1>
+            <RepoGrid repos={this.state.repos} />
+          </div>
+        )}
       </div>
     );
   }
